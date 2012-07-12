@@ -81,8 +81,10 @@ class Timecode:
 
     def checktype(f):
         def check(self, other):
-            if not isinstance(other, Timecode): raise TypeError()
+            if not isinstance(other, Timecode):
+                raise TypeError()
             return f(self, other)
+
         return check
 
     @checktype
@@ -127,7 +129,10 @@ class SubRip(list):
     def __init__(self, rawdata):
         for each in rawdata.strip().replace('\r\n', '\n').split('\n\n'):
             each = each.split('\n')
-            entry = {"index": int(each[0], 10), "text": "\n".join(each[2:])}
+            entry = {
+                "index": int(each[0], 10),
+                "text": "\n".join(each[2:])
+            }
             start, end = [Timecode(p.strip()) for p in each[1].split("-->")]
             entry.update({"start": start, "end": end})
 
@@ -199,8 +204,10 @@ Available subcommands:
      help (h, ?)
 """
 
-        if len(argv) > 2: raise Usage(self.aliases()[argv[2]].__doc__)
-        else: raise Usage(self.aliases()[argv[1]].__doc__)
+        if len(argv) > 2:
+            raise Usage(self.aliases()[argv[2]].__doc__)
+        else:
+            raise Usage(self.aliases()[argv[1]].__doc__)
 
     @classmethod
     def version(self, argv):
@@ -214,9 +221,10 @@ usage: shiftby --by="TIMECODE" [FILES]...
 
 Valid options:
     -b "TIMECODE" [--by="TIMECODE"] : The duration, specified in SRT timecode
-                                                                        format, by which to shift subtitle file(s)"""
+                                      format, by which to shift subtitle file(s)"""
 
         opts, files = getopt.getopt(argv[2:], "b", ["by="])
+
         by = None
         for option, value in opts:
             if option == "--by":
@@ -241,15 +249,15 @@ Valid options:
     @classmethod
     def shift(self, argv):
         """shift: Shift all timecodes in subtitle file(s) by the difference between `to` and
-             `target'.
+       `target'.
 usage: shift --target="TIMECODE" --to="TIMECODE" [FILES]...
 
 Valid options:
     -a "TIMECODE" [--target="TIMECODE"] : The target timecode.
-    -t "TIMECODE" [--to="TIMECODE"]         : The timecode to which the target is shifted."""
+    -t "TIMECODE" [--to="TIMECODE"]     : The timecode to which the target is shifted."""
 
         opts, files = getopt.getopt(argv[2:], "at", ["target=", "to="])
-        by = None
+
         for option, value in opts:
             if option == "--target":
                 try:
@@ -282,15 +290,18 @@ Valid options:
     @classmethod
     def merge(self, argv):
         """merge: Merge all specified subtitle files according to the first file. Results
-             are dumped to STDOUT.
+       are dumped to STDOUT.
 usage: merge: BASEFILE SECONDFILE [OTHERFILES]..."""
+
         opts, files = getopt.getopt(argv[2:], "", [])
+
         if len(files) < 2:
             raise Usage("What good is there to merge, when there is naught but one item?")
 
         files = [open(file) for file in files]
         subs = [each.read() for each in files]
-        for each in files: each.close()
+        for each in files:
+            each.close()
 
         subs = [SubRip(each) for each in subs]
         base, subs = (subs[0], subs[1:])
@@ -307,18 +318,19 @@ usage: merge: BASEFILE SECONDFILE [OTHERFILES]..."""
     @classmethod
     def stretch(self, argv):
         """stretch: Stretch or squeeze all timecodes in subtitle file(s) by a certain
-                 factor.
+         factor.
 usage: stretch --factor="FACTOR" [--anchor="TIMECODE"] [FILES]...
 
 Valid options:
-    -f "FACTOR" [--factor="FACTOR"]         : The factor by which to stretch or
-                                                                                squeeze all timecodes in the subtitle
-                                                                                file(s)
+    -f "FACTOR" [--factor="FACTOR"]     : The factor by which to stretch or
+                                          squeeze all timecodes in the subtitle
+                                          file(s)
     -a "TIMECODE" [--anchor="TIMECODE"] : The anchor, or the timecode that will
-                                                                                stay the same, specified in SRT timecode
-                                                                                format. This is 00:00:00,000 by default."""
+                                          stay the same, specified in SRT timecode
+                                          format. This is 00:00:00,000 by default."""
 
         opts, files = getopt.getopt(argv[2:], "fa", ["factor=", "anchor="])
+
         factor, anchor = None, None
         for option, value in opts:
             if option == "--factor":
@@ -350,17 +362,18 @@ Valid options:
     @classmethod
     def sync(self, argv):
         """sync: Make timecode `target' become timecode `goal' by intelligently stretching or
-            squeezing with respect to the anchor.
+      squeezing with respect to the anchor.
 usage: sync --target="TIMECODE" --goal="TIMECODE" [--anchor="TIMECODE"] [FILES]...
 
 Valid options:
     -t "TIMECODE" [--target="TIMECODE"] : The source timecode.
-    -g "TIMECODE" [--goal="TIMECODE"]     : The destination timecode.
+    -g "TIMECODE" [--goal="TIMECODE"]   : The destination timecode.
     -a "TIMECODE" [--anchor="TIMECODE"] : The anchor, or the timecode that will
-                                                                                stay the same, specified in SRT timecode
-                                                                                format. This is 00:00:00,000 by default."""
+                                          stay the same, specified in SRT timecode
+                                          format. This is 00:00:00,000 by default."""
 
         opts, files = getopt.getopt(argv[2:], "tga", ["target=", "goal=", "anchor="])
+
         target, goal, anchor = None, None, None
         for option, value in opts:
             if option == "--target":
@@ -403,7 +416,9 @@ Valid options:
     def reindex(self, argv):
         """reindex: Reindex all specified subtitle files, ignoring the original indices.
 usage: reindex: FILES..."""
+
         opts, files = getopt.getopt(argv[2:], "", [])
+
         for file in [open(file, "r+") for file in files]:
             subs = SubRip(file.read())
             subs.reindex()
@@ -413,26 +428,34 @@ usage: reindex: FILES..."""
                 file.truncate()
             finally:
                 file.close()
+
     @classmethod
     def replace(self, argv):
         """replace: Replace a string with another string for all lines in the specified
-                 subtitle file(s).
+         subtitle file(s).
 usage: replace --find="STRING1" --replace-with="STRING2" [FILES]...
 
 Valid options:
-    -f "STRING1" [--find="STRING1"]                 : The string to search for.
+    -f "STRING1" [--find="STRING1"]         : The string to search for.
     -r "STRING2" [--replace-with="STRING2"] : The string to replace with."""
+
         opts, files = getopt.getopt(argv[2:], "fr", ["find=", "replace-with="])
+
         find, replace = None, None
         for option, value in opts:
-            if option == "--find": find = value
-            if option == "--replace-with": replace = value
+            if option == "--find":
+                find = value
+            if option == "--replace-with":
+                replace = value
+
         if find == None or replace == None:
             raise Usage("Both the string to search for and the string to replace with must be specified.")
 
         for file in [open(file, "r+") for file in files]:
             subs = SubRip(file.read())
-            for sub in subs: sub["text"] = sub["text"].replace(find, replace)
+            for sub in subs:
+                sub["text"] = sub["text"].replace(find, replace)
+
             try:
                 file.seek(0)
                 file.write(str(subs))
@@ -449,7 +472,9 @@ class Usage(Exception):
 
 
 def main(argv=None):
-    if argv is None: argv = sys.argv
+    if argv is None:
+        argv = sys.argv
+
     try:
         try:
             # No subcommand specified
