@@ -459,9 +459,10 @@ def main(argv=None):
             subcommand = argv[1]
             # Strip away prefixing dashes in subcommands
             for t in (1, 2):
-                if subcommand[0] == '-': subcommand = subcommand[1:]
+                if subcommand[0] == '-':
+                    subcommand = subcommand[1:]
 
-            if subcommand not in SRT.aliases().keys():
+            if subcommand not in SRT.aliases():
                 raise Usage("Unrecognized subcommand. \nType '#{name} help' for usage.")
 
             # Dispatch arguments
