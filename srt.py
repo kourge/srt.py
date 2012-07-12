@@ -212,7 +212,7 @@ Available subcommands:
     @classmethod
     def version(self, argv):
         """version: Display the version."""
-        print "SRT Tools %s" % VERSION
+        print "srt.py %s" % VERSION
 
     @classmethod
     def shiftby(self, argv):
