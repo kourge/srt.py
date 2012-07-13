@@ -66,11 +66,8 @@ class Timecode:
 
         hours = total
 
-        formatted = "%02d:%02d:%02d,%03d" % (hours, minutes, seconds, milliseconds)
-        if not negative:
-            return formatted
-        else:
-            return '-' + formatted
+        sign = '-' if negative else ''
+        return "%s%02d:%02d:%02d,%03d" % (sign, hours, minutes, seconds, milliseconds)
 
     def __str__(self):
         return self.stringify(self.ms)
