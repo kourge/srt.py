@@ -5,7 +5,7 @@ import getopt
 
 VERSION="1.3"
 
-class Timecode:
+class Timecode(object):
     def __init__(self, time):
         if isinstance(time, (int, long)):
             self.ms = time
@@ -170,7 +170,7 @@ class SubRip(list):
 
 
 
-class SRT:
+class SRT(object):
     @classmethod
     def aliases(self):
         return {
