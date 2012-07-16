@@ -233,15 +233,13 @@ Valid options:
         if by == None:
             raise Usage("Duration to shift by must be specified.")
 
-        for file in [open(file, "r+") for file in files]:
-            subs = SubRip(file.read())
-            subs.shift_time_by(by)
-            try:
+        for filename in files:
+            with open(filename, 'r+') as file:
+                subs = SubRip(file.read())
+                subs.shift_time_by(by)
                 file.seek(0)
                 file.write(str(subs))
                 file.truncate()
-            finally:
-                file.close()
 
     @classmethod
     def shift(self, argv):
@@ -274,15 +272,13 @@ Valid options:
 
         by = to - target
 
-        for file in [open(file, "r+") for file in files]:
-            subs = SubRip(file.read())
-            subs.shift_time_by(by)
-            try:
+        for filename in files:
+            with open(filename, 'r+') as file:
+                subs = SubRip(file.read())
+                subs.shift_time_by(by)
                 file.seek(0)
                 file.write(str(subs))
                 file.truncate()
-            finally:
-                file.close()
 
     @classmethod
     def merge(self, argv):
@@ -295,10 +291,10 @@ usage: merge: BASEFILE SECONDFILE [OTHERFILES]..."""
         if len(files) < 2:
             raise Usage("What good is there to merge, when there is naught but one item?")
 
-        files = [open(file) for file in files]
-        subs = [each.read() for each in files]
-        for each in files:
-            each.close()
+        subs = []
+        for filename in files:
+            with open(filename) as file:
+                subs.append(file.read())
 
         subs = [SubRip(each) for each in subs]
         base, subs = (subs[0], subs[1:])
@@ -346,15 +342,13 @@ Valid options:
         if anchor == None:
             anchor = Timecode("00:00:00,000")
 
-        for file in [open(file, "r+") for file in files]:
-            subs = SubRip(file.read())
-            subs.resize(anchor, factor)
-            try:
+        for filename in files:
+            with open(filename, 'r+') as file:
+                subs = SubRip(file.read())
+                subs.resize(anchor, factor)
                 file.seek(0)
                 file.write(str(subs))
                 file.truncate()
-            finally:
-                file.close()
 
     @classmethod
     def sync(self, argv):
@@ -396,18 +390,16 @@ Valid options:
         if anchor == None:
             anchor = Timecode("00:00:00,000")
 
-        for file in [open(file, "r+") for file in files]:
-            subs = SubRip(file.read())
-            target -= anchor
-            goal -= anchor
-            factor = float(goal.milliseconds()) / float(target.milliseconds())
-            subs.resize(anchor, factor)
-            try:
+        for filename in files:
+            with open(filename, 'r+') as file:
+                subs = SubRip(file.read())
+                target -= anchor
+                goal -= anchor
+                factor = float(goal.milliseconds()) / float(target.milliseconds())
+                subs.resize(anchor, factor)
                 file.seek(0)
                 file.write(str(subs))
                 file.truncate()
-            finally:
-                file.close()
 
     @classmethod
     def reindex(self, argv):
@@ -416,15 +408,13 @@ usage: reindex: FILES..."""
 
         opts, files = getopt.getopt(argv[2:], "", [])
 
-        for file in [open(file, "r+") for file in files]:
-            subs = SubRip(file.read())
-            subs.reindex()
-            try:
+        for filename in files:
+            with open(filename, 'r+') as file:
+                subs = SubRip(file.read())
+                subs.reindex()
                 file.seek(0)
                 file.write(str(subs))
                 file.truncate()
-            finally:
-                file.close()
 
     @classmethod
     def replace(self, argv):
@@ -448,17 +438,15 @@ Valid options:
         if find == None or replace == None:
             raise Usage("Both the string to search for and the string to replace with must be specified.")
 
-        for file in [open(file, "r+") for file in files]:
-            subs = SubRip(file.read())
-            for sub in subs:
-                sub["text"] = sub["text"].replace(find, replace)
+        for filename in files:
+            with open(filename, 'r+') as file:
+                subs = SubRip(file.read())
+                for sub in subs:
+                    sub["text"] = sub["text"].replace(find, replace)
 
-            try:
                 file.seek(0)
                 file.write(str(subs))
                 file.truncate()
-            finally:
-                file.close()
 
 
 
