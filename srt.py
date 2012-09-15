@@ -168,6 +168,11 @@ class SubRip(list):
         for i in range(0, len(self)):
             self[i]["index"] = i + 1
 
+    def strip(self):
+        """Strip off whitespace from all texts."""
+        for each in self:
+            each["text"] = each["text"].strip()
+
 
 
 class SRT(object):
@@ -178,6 +183,7 @@ class SRT(object):
             "shiftby": self.shiftby,
             "merge": self.merge,
             "reindex": self.reindex,
+            "strip": self.strip,
             "stretch": self.stretch, "squeeze": self.stretch,
             "sync": self.sync,
             "replace": self.replace,
@@ -194,6 +200,7 @@ Available subcommands:
      shift
      shiftby
      reindex
+     strip
      stretch (squeeze)
      sync
      replace
@@ -412,6 +419,21 @@ usage: reindex: FILES..."""
             with open(filename, 'r+') as file:
                 subs = SubRip(file.read())
                 subs.reindex()
+                file.seek(0)
+                file.write(str(subs))
+                file.truncate()
+
+    @classmethod
+    def strip(self, argv):
+        """strip: Strip off whitespace from the texts of all specified subtitle files.
+usage: strip: FILES..."""
+
+        opts, files = getopt.getopt(argv[2:], "", [])
+
+        for filename in files:
+            with open(filename, 'r+') as file:
+                subs = SubRip(file.read())
+                subs.strip()
                 file.seek(0)
                 file.write(str(subs))
                 file.truncate()
